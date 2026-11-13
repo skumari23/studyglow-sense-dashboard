@@ -28,3 +28,8 @@ use the editor.
   own key and store it in Secrets.
 - **Secrets.** Lovable manages them. Do not put secret values in the repo.
 <!-- LOVABLE:END -->
+
+## StudySense
+- This web app is a UI preview of a Streamlit spec; Streamlit/Python cannot run in this stack, so pages are TanStack routes (`/`, `/alerts`, `/assistant`) — keep exactly these three pages.
+- Demo records live only in `src/lib/studysense/demo-data.ts` and every page shows a Demo Mode label, so synthetic data never mixes with real readings.
+- Alert rules and the action allow-list live in `src/lib/studysense/thresholds.ts` (tested), so UI and assistant share one source of truth.
