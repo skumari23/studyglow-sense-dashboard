@@ -30,14 +30,16 @@ interface RoomProfile {
   hasPressure: boolean;
 }
 
+const DEFAULT_PROFILE: RoomProfile = { seed: 42, tempStart: 22.8, tempRise: 3.6, humidity: 47, luxStart: 430, luxDrop: 250, quietDbfs: -47, noisyFrom: 39, hasPressure: false };
+
 const PROFILES: Record<string, RoomProfile> = {
-  "studysense-pi5-01": { seed: 42, tempStart: 22.8, tempRise: 3.6, humidity: 47, luxStart: 430, luxDrop: 250, quietDbfs: -47, noisyFrom: 39, hasPressure: false },
+  "studysense-pi5-01": DEFAULT_PROFILE,
   "studysense-pi5-02": { seed: 7, tempStart: 21.2, tempRise: 0.8, humidity: 42, luxStart: 520, luxDrop: 60, quietDbfs: -55, noisyFrom: 999, hasPressure: true },
   "studysense-pi5-03": { seed: 99, tempStart: 24.1, tempRise: 1.4, humidity: 55, luxStart: 260, luxDrop: 120, quietDbfs: -42, noisyFrom: 20, hasPressure: true },
 };
 
 function buildDemoRecords(deviceId: string): StudySenseRecord[] {
-  const pr = PROFILES[deviceId] ?? PROFILES["studysense-pi5-01"];
+  const pr = PROFILES[deviceId] ?? DEFAULT_PROFILE;
   const rand = seeded(pr.seed);
   const out: StudySenseRecord[] = [];
   const count = 48; // 4 hours at 5-minute intervals
