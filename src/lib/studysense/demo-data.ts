@@ -1,6 +1,7 @@
 // DEMO MODE ONLY. Synthetic records, isolated here so they can never mix with real
 // readings. Every screen that uses them shows a visible "Demo Mode" label.
 import type { DataSource, StudySenseRecord } from "./types";
+import { resolveDevice } from "./devices";
 
 export const DB_PATH = "/home/shreyak/NOTE/studysense_db.json";
 
@@ -16,8 +17,28 @@ function seeded(seed: number) {
 
 const round = (n: number, d = 1) => Math.round(n * 10 ** d) / 10 ** d;
 
-function buildDemoRecords(): StudySenseRecord[] {
-  const rand = seeded(42);
+// Each demo room gets its own character so switching devices visibly changes the readings.
+interface RoomProfile {
+  seed: number;
+  tempStart: number;
+  tempRise: number;
+  humidity: number;
+  luxStart: number;
+  luxDrop: number;
+  quietDbfs: number;
+  noisyFrom: number; // record index where it gets loud; > count means never
+  hasPressure: boolean;
+}
+
+const PROFILES: Record<string, RoomProfile> = {
+  "studysense-pi5-01": { seed: 42, tempStart: 22.8, tempRise: 3.6, humidity: 47, luxStart: 430, luxDrop: 250, quietDbfs: -47, noisyFrom: 39, hasPressure: false },
+  "studysense-pi5-02": { seed: 7, tempStart: 21.2, tempRise: 0.8, humidity: 42, luxStart: 520, luxDrop: 60, quietDbfs: -55, noisyFrom: 999, hasPressure: true },
+  "studysense-pi5-03": { seed: 99, tempStart: 24.1, tempRise: 1.4, humidity: 55, luxStart: 260, luxDrop: 120, quietDbfs: -42, noisyFrom: 20, hasPressure: true },
+};
+
+function buildDemoRecords(deviceId: string): StudySenseRecord[] {
+  const pr = PROFILES[deviceId] ?? PROFILES["studysense-pi5-01"];
+  const rand = seeded(pr.seed);
   const out: StudySenseRecord[] = [];
   const count = 48; // 4 hours at 5-minute intervals
   for (let i = 0; i < count; i++) {
@@ -25,15 +46,15 @@ function buildDemoRecords(): StudySenseRecord[] {
     const hh = String(Math.floor(minutes / 60)).padStart(2, "0");
     const mm = String(minutes % 60).padStart(2, "0");
     const p = i / (count - 1);
-    const noisy = i > 38;
-    const noise = noisy ? -30 + rand() * 4 : -47 + rand() * 8;
+    const noisy = i >= pr.noisyFrom;
+    const noise = noisy ? -30 + rand() * 4 : pr.quietDbfs + rand() * 8;
     out.push({
-      device_id: "studysense-pi5-01",
+      device_id: deviceId,
       timestamp: `2026-11-12T${hh}:${mm}:00-06:00`,
-      temperature_c: round(22.8 + p * 3.6 + (rand() - 0.5) * 0.4),
-      humidity_pct: round(47 - p * 5 + (rand() - 0.5) * 1.2),
-      pressure_hpa: null,
-      light_lux: Math.round(430 - p * 250 + (rand() - 0.5) * 30),
+      temperature_c: round(pr.tempStart + p * pr.tempRise + (rand() - 0.5) * 0.4),
+      humidity_pct: round(pr.humidity - p * 5 + (rand() - 0.5) * 1.2),
+      pressure_hpa: pr.hasPressure ? round(1012.4 - p * 1.8 + (rand() - 0.5) * 0.6) : null,
+      light_lux: Math.round(pr.luxStart - p * pr.luxDrop + (rand() - 0.5) * 30),
       presence_detected: i < 8 ? false : rand() > 0.12,
       face_detected: rand() > 0.6,
       recognized_user: null,
@@ -41,7 +62,7 @@ function buildDemoRecords(): StudySenseRecord[] {
       sensor_health: {
         temperature: "ok",
         humidity: "ok",
-        pressure: "no_data",
+        pressure: pr.hasPressure ? "ok" : "no_data",
         light: "ok",
         mmwave: "ok",
         camera: "ok",
@@ -56,6 +77,7 @@ function buildDemoRecords(): StudySenseRecord[] {
   return out;
 }
 
-export function getDemoSource(): DataSource {
-  return { mode: "demo", path: DB_PATH, records: buildDemoRecords() };
+export function getDemoSource(deviceId?: string): DataSource {
+  const device = resolveDevice(deviceId);
+  return { mode: "demo", path: DB_PATH, records: buildDemoRecords(device.id) };
 }

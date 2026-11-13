@@ -22,7 +22,8 @@ export const Route = createFileRoute("/assistant")({
       { name: "twitter:card", content: "summary" },
     ],
   }),
-  loader: () => getDemoSource(),
+  loaderDeps: ({ search }) => ({ device: search.device }),
+  loader: ({ deps }) => getDemoSource(deps.device),
   component: AssistantPage,
 });
 

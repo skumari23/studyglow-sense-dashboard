@@ -33,3 +33,4 @@ use the editor.
 - This web app is a UI preview of a Streamlit spec; Streamlit/Python cannot run in this stack, so pages are TanStack routes (`/`, `/alerts`, `/assistant`) — keep exactly these three pages.
 - Demo records live only in `src/lib/studysense/demo-data.ts` and every page shows a Demo Mode label, so synthetic data never mixes with real readings.
 - Alert rules and the action allow-list live in `src/lib/studysense/thresholds.ts` (tested), so UI and assistant share one source of truth.
+- The selected device/room is the root `?device=` search param (list in `src/lib/studysense/devices.ts`); every page loads records via `loaderDeps` from it, so all three pages always show the same room.

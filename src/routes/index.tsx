@@ -19,6 +19,7 @@ import { MetricCard } from "@/components/studysense/MetricCard";
 import { HistoryChart } from "@/components/studysense/HistoryChart";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { getDemoSource } from "@/lib/studysense/demo-data";
+import { resolveDevice } from "@/lib/studysense/devices";
 import { clock, dateTime, fmt } from "@/lib/studysense/format";
 import { usePreferences } from "@/lib/studysense/store";
 import { evaluateReading } from "@/lib/studysense/thresholds";
@@ -35,7 +36,8 @@ export const Route = createFileRoute("/")({
       { name: "twitter:card", content: "summary" },
     ],
   }),
-  loader: () => getDemoSource(),
+  loaderDeps: ({ search }) => ({ device: search.device }),
+  loader: ({ deps }) => getDemoSource(deps.device),
   component: Dashboard,
 });
 
@@ -67,7 +69,7 @@ function DashboardView({ records, latest }: { records: StudySenseRecord[]; lates
 
   return (
     <>
-      <PageHeader eyebrow={`Device ${latest.device_id}`} title="Dashboard">
+      <PageHeader eyebrow={`${resolveDevice(latest.device_id).room} · ${latest.device_id}`} title="Dashboard">
         <div className="flex flex-col items-end gap-2">
           <DemoBadge />
           <div className="readout text-xs text-muted-foreground">Latest record {dateTime(latest.timestamp)}</div>
@@ -77,6 +79,7 @@ function DashboardView({ records, latest }: { records: StudySenseRecord[]; lates
       {showBanner && (
         <Link
           to="/alerts"
+          search={true}
           className="mb-6 flex items-center gap-3 rounded-lg border border-warning/40 bg-warning/10 px-4 py-3 text-sm transition-colors hover:bg-warning/15"
         >
           <TriangleAlert className="h-4 w-4 shrink-0 text-warning" />

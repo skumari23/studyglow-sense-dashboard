@@ -2,6 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { Activity, BellRing, Bot, FlaskConical, ShieldCheck } from "lucide-react";
 import type { ReactNode } from "react";
 import { DB_PATH } from "@/lib/studysense/demo-data";
+import { DeviceSwitcher } from "./DeviceSwitcher";
 
 const NAV = [
   { to: "/", label: "Dashboard", icon: Activity },
@@ -23,11 +24,13 @@ export function AppShell({ children }: { children: ReactNode }) {
               <div className="eyebrow">Raspberry Pi 5</div>
             </div>
           </div>
+          <DeviceSwitcher />
           <nav className="flex gap-1 overflow-x-auto md:flex-col">
             {NAV.map(({ to, label, icon: Icon }) => (
               <Link
                 key={to}
                 to={to}
+                search={true}
                 activeOptions={{ exact: true }}
                 className="flex shrink-0 items-center gap-3 rounded-md px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
                 activeProps={{ className: "bg-sidebar-accent text-sidebar-accent-foreground" }}

@@ -60,7 +60,7 @@ export function evaluateReading(r: StudySenseRecord, prefs: Preferences): StudyA
   const alerts: StudyAlert[] = [];
   const mk = (a: Omit<StudyAlert, "id" | "readingTimestamp">): StudyAlert => ({
     ...a,
-    id: `${r.timestamp}:${a.kind}:${a.title}`,
+    id: `${r.device_id}:${r.timestamp}:${a.kind}:${a.title}`,
     readingTimestamp: r.timestamp,
   });
   const missing: string[] = [];
