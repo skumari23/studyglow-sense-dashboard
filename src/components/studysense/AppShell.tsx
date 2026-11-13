@@ -1,8 +1,7 @@
 import { Link } from "@tanstack/react-router";
-import { Activity, BellRing, Bot, FlaskConical, ShieldCheck } from "lucide-react";
+import { Activity, BellRing, BookOpen, Bot, FlaskConical, ShieldCheck } from "lucide-react";
 import type { ReactNode } from "react";
 import { DB_PATH } from "@/lib/studysense/demo-data";
-import teddyBear from "@/assets/teddy-bear.png";
 import { DeviceSwitcher } from "./DeviceSwitcher";
 
 const NAV = [
@@ -17,8 +16,8 @@ export function AppShell({ children }: { children: ReactNode }) {
       <aside className="border-b border-sidebar-border bg-sidebar md:sticky md:top-0 md:h-screen md:border-b-0 md:border-r">
         <div className="flex h-full flex-col gap-6 p-5">
           <div className="flex items-center gap-3">
-            <div className="grid h-9 w-9 place-items-center overflow-hidden rounded-md bg-secondary shadow-glow">
-              <img src={teddyBear} alt="StudySense teddy bear" width={36} height={36} className="h-9 w-9 object-cover" />
+            <div className="grid h-9 w-9 place-items-center rounded-md bg-primary text-primary-foreground shadow-glow">
+              <BookOpen className="h-5 w-5" />
             </div>
             <div>
               <div className="font-semibold tracking-tight">StudySense</div>
